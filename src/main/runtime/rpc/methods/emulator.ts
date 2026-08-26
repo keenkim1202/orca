@@ -16,6 +16,7 @@ import {
   ListParams,
   LogcatParams,
   PermissionsParams,
+  RecordTargetParams,
   RotateParams,
   ShutdownParams,
   TapParams,
@@ -27,6 +28,18 @@ const InstallParams = z.object({
     message: 'path must be absolute'
   }),
   reinstall: z.boolean().optional(),
+  device: z.string().optional(),
+  emulator: z.string().optional(),
+  worktree: z.string().optional()
+})
+
+const RecordStartParams = z.object({
+  // Absolute like install; the runtime supplies a default under userData when omitted.
+  path: z
+    .string()
+    .refine((value) => path.isAbsolute(value), { message: 'path must be absolute' })
+    .optional(),
+  name: z.string().optional(),
   device: z.string().optional(),
   emulator: z.string().optional(),
   worktree: z.string().optional()
@@ -122,6 +135,21 @@ export const EMULATOR_METHODS = [
     name: 'emulator.logcat',
     params: LogcatParams,
     handler: async (params, { runtime }) => runtime.emulatorLogcat(params)
+  }),
+  defineMethod({
+    name: 'emulator.recordStart',
+    params: RecordStartParams,
+    handler: async (params, { runtime }) => runtime.emulatorRecordStart(params)
+  }),
+  defineMethod({
+    name: 'emulator.recordStop',
+    params: RecordTargetParams,
+    handler: async (params, { runtime }) => runtime.emulatorRecordStop(params)
+  }),
+  defineMethod({
+    name: 'emulator.recordStatus',
+    params: RecordTargetParams,
+    handler: async (params, { runtime }) => runtime.emulatorRecordStatus(params)
   }),
   defineMethod({
     name: 'emulator.unregisterActive',
